@@ -99,9 +99,7 @@ function writeToFile(fileName, data){
 
 function userMenu(){
     inquirer.prompt(menu).then((response) => {
-        console.log(response)
         if (response.menu == 'Add an engineer'){
-            console.log(response)
             inquirer.prompt(engineerQuestions).then((engineer) => {
                 const engin = new Engineer(engineer.engineerName, engineer.engineerId, engineer.engineerEmail, engineer.engineerGithub)
                 team.push(engin)
@@ -109,7 +107,6 @@ function userMenu(){
             })
         }
         else if (response.menu == 'Add an intern'){
-            console.log(response)
             inquirer.prompt(internQuestions).then((intern) => {
                 const int = new Intern(intern.internName, intern.internId, intern.internEmail, intern.internSchool)
                 team.push(int)
@@ -117,7 +114,6 @@ function userMenu(){
             })
         }
         else if(response.menu === 'Finish team'){
-            console.log(response)
             teamIsComplete = true;
             writeToFile(outputPath, render(team))
         }
