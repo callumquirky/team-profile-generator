@@ -1,5 +1,11 @@
 {
   "dependencies": {
     "inquirer": "^9.1.4"
+  },
+  "scripts": {
+    "test": "jest"
+  },
+  "devDependencies": {
+    "jest": "^24.9.0"
   }
 }

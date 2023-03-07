@@ -1,54 +1,71 @@
+const Employee = require("./lib/Employee")
+const Manager = require("./lib/Manager");
+const Engineer = require("./lib/Engineer");
+const Intern = require("./lib/Intern");
 const inquirer = require("inquirer");
-const { default: Choices } = require("inquirer/lib/objects/choices");
+const path = require("path");
+const fs = require("fs");
+
+const OUTPUT_DIR = path.resolve(__dirname, "output");
+const outputPath = path.join(OUTPUT_DIR, "team.html");
+
+const render = require("./src/page-template.js");
+
+
+// TODO: Write Code to gather information about the development team members, and render the HTML file.
+
+let team = []
+
+let teamIsComplete = false
 
 const managerQuestions = [
     {
         type: "input",
-        name: "manager-name",
+        name: "managerName",
         message: "What is the manager's name?",
     },
     {
         type: "input",
-        name: "manager-id",
+        name: "managerId",
         message: "What is the manager's employee id?",
     },
     {
         type: "input",
-        name: "manager-email",
+        name: "managerEmail",
         message: "What is the manager's email address?",
     },
     {
         type: "input",
-        name: "manager-office",
+        name: "managerOffice",
         message: "What is the manager's office number?",
     },
 ]
 
-const menu = [{
+const menu = {
     type:"list",
     name:"menu",
-    choices:["Add an engineer", "Add an intern", "Finish team"],
-}]
+    choices:[{name: "Add an engineer",  value:"Add an engineer"}, {name: "Add an intern", value:"Add an intern"}, {name:"Finish team", value:"Finish team"}],
+}
 
-const engingeerQuestions = [
+const engineerQuestions = [
     {
         type: "input",
-        name: "engineer-name",
+        name: "engineerName",
         message:"What is the engineer's name?"  
     },
     {
         type: "input",
-        name: "engineer-id",
+        name: "engineerId",
         message: "What is the engineer's employee id?",
     },
     {
         type: "input",
-        name: "engineer-email",
+        name: "engineerEmail",
         message: "What is the engineer's email address?",
     },
     {
         type: "input",
-        name: "engineer-github",
+        name: "engineerGithub",
         message: "What is the engineer's GitHub username?",
     },
 ]
@@ -56,22 +73,66 @@ const engingeerQuestions = [
 const internQuestions = [
     {
         type: "input",
-        name: "intern-name",
+        name: "internName",
         message:"What is the intern's name?"  
     },
     {
         type: "input",
-        name: "intern-id",
+        name: "internId",
         message:"What is the intern's employee id?"  
     }, 
     {
         type: "input",
-        name: "intern-email",
+        name: "internEmail",
         message:"What is the intern's email?"  
     }, 
     {
         type: "input",
-        name: "intern-school",
+        name: "internSchool",
         message:"What is the intern's school?"  
     },    
 ]
+
+function writeToFile(fileName, data){
+    return fs.writeFileSync(path.join(fileName), data)
+}
+
+function userMenu(){
+    inquirer.prompt(menu).then((response) => {
+        console.log(response)
+        if (response.menu == 'Add an engineer'){
+            console.log(response)
+            inquirer.prompt(engineerQuestions).then((engineer) => {
+                const engin = new Engineer(engineer.engineerName, engineer.engineerId, engineer.engineerEmail, engineer.engineerGithub)
+                team.push(engin)
+                userMenu()
+            })
+        }
+        else if (response.menu == 'Add an intern'){
+            console.log(response)
+            inquirer.prompt(internQuestions).then((intern) => {
+                const int = new Intern(intern.internName, intern.internId, intern.internEmail, intern.internSchool)
+                team.push(int)
+                userMenu()
+            })
+        }
+        else if(response.menu === 'Finish team'){
+            console.log(response)
+            teamIsComplete = true;
+            writeToFile(outputPath, render(team))
+        }
+    }) 
+}
+
+
+function init(){
+    inquirer.prompt(managerQuestions).then((manager) => {
+        const manag = new Manager(manager.managerName, manager.managerId, manager.managerEmail, manager.managerOffice)
+        team.push(manag)
+        if (team.includes(manag)){
+            userMenu()
+        }
+    })
+}
+
+init()
